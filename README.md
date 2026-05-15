@@ -25,7 +25,7 @@ A RESTful API for managing a library system — books, readers, and borrow recor
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/library-api.git
+git clone https: https://github.com/Trannganne/library_system.git
 cd library-api
 pip install -r requirements.txt
 ```
