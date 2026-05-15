@@ -25,8 +25,22 @@ A RESTful API for managing a library system — books, readers, and borrow recor
 ### 1. Clone & install
 
 ```bash
+<<<<<<< HEAD
 git clone https: https://github.com/Trannganne/library_system.git
+=======
+git clone https://github.com/Trannganne/library_system.git
+>>>>>>> 7a38193 (docs: update README and add project screenshots)
 cd library-api
+pip install -r requirements.txt
+```
+
+### 2. Create Virtual Environment
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+## 3. Install dependencies
+```bash
 pip install -r requirements.txt
 ```
 
@@ -34,7 +48,9 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# Edit .env with your PostgreSQL credentials
+#Update PostgreSQL configuration inside .env.
+# Example:
+
 ```
 
 ### 3. Create PostgreSQL database
@@ -51,6 +67,11 @@ uvicorn app.main:app --reload
 
 Visit **http://localhost:8000/docs** for interactive API documentation.
 
+### 5. Run UI
+```Open library-ui.htmml in your browser.
+Frontend communicates directly with FastAPI backend.
+```
+
 ## 📁 Project Structure
 
 ```
@@ -61,10 +82,13 @@ library-api/
 │   ├── models/           # SQLAlchemy ORM models
 │   ├── schemas/          # Pydantic request/response schemas
 │   ├── routers/          # API route handlers
-│   └── core/             # Config & security (JWT, hashing)
+│   └── core/     
+├── images/      
+├── library-ui.html        # Frontend interface
 ├── requirements.txt
 ├── .env.example
 └── README.md
+
 ```
 
 ## 🔗 API Endpoints
