@@ -25,13 +25,8 @@ A RESTful API for managing a library system — books, readers, and borrow recor
 ### 1. Clone & install
 
 ```bash
-<<<<<<< HEAD
-git clone https: https://github.com/Trannganne/library_system.git
-=======
 git clone https://github.com/Trannganne/library_system.git
->>>>>>> 7a38193 (docs: update README and add project screenshots)
 cd library-api
-pip install -r requirements.txt
 ```
 
 ### 2. Create Virtual Environment
@@ -39,27 +34,20 @@ pip install -r requirements.txt
 python -m venv venv
 venv\Scripts\activate
 ```
-## 3. Install dependencies
+### 3. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Setup environment
+### 4. Setup environment
 
 ```bash
 cp .env.example .env
 #Update PostgreSQL configuration inside .env.
-# Example:
 
 ```
 
-### 3. Create PostgreSQL database
-
-```sql
-CREATE DATABASE library_db;
-```
-
-### 4. Run the server
+### 5. Run the server
 
 ```bash
 uvicorn app.main:app --reload
@@ -67,8 +55,8 @@ uvicorn app.main:app --reload
 
 Visit **http://localhost:8000/docs** for interactive API documentation.
 
-### 5. Run UI
-```Open library-ui.htmml in your browser.
+### 6. Run UI
+```Open library-ui.html in your browser.
 Frontend communicates directly with FastAPI backend.
 ```
 
@@ -125,3 +113,14 @@ library-api/
 | GET | `/borrow/reader/{ma_doc_gia}` | Lịch sử mượn theo độc giả |
 | POST | `/borrow` | Tạo phiếu mượn |
 | PATCH | `/borrow/return` | Trả sách |
+
+## Screenshots
+
+### Swagger API Documentation
+![Swagger](images/swagger-ui.png)
+
+### Login API with JWT Authentication
+![Login API](images/login-api.png)
+
+### Library Frontend UI
+![Library UI](images/library-ui.png)
