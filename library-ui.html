@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📚 Library Management</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface2: #242424;
+      --border: #2e2e2e;
+      --accent: #40E0D0;
+      --accent2: #0099ff;
+      --danger: #ff4757;
+      --warning: #ffa502;
+      --text: #e8e8e8;
+      --muted: #666;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .logo {
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo h1 {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .logo p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .nav {
+      padding: 16px 0;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--muted);
+      transition: all 0.15s;
+      border-left: 2px solid transparent;
+    }
+
+    .nav-item:hover {
+      color: var(--text);
+      background: var(--surface2);
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(0, 229, 160, 0.05);
+    }
+
+    .nav-item .icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .auth-status {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .auth-status .label {
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .auth-status .user {
+      color: var(--accent);
+      font-family: var(--mono);
+    }
+
+    .auth-status .user.none {
+      color: var(--danger);
+    }
+
+    /* MAIN */
+    .main {
+      margin-left: 220px;
+      flex: 1;
+      padding: 32px;
+      max-width: calc(100vw - 220px);
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-title {
+      font-family: var(--mono);
+      font-size: 20px;
+      color: var(--accent);
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    /* FORMS */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-grid.single {
+      grid-template-columns: 1fr;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    input,
+    select,
+    textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 12px;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 9px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: var(--sans);
+      font-weight: 500;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #00c98a;
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-danger {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 71, 87, 0.25);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid rgba(46, 46, 46, 0.5);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: var(--surface2);
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--mono);
+    }
+
+    .badge-green {
+      background: rgba(0, 229, 160, 0.15);
+      color: var(--accent);
+    }
+
+    .badge-red {
+      background: rgba(255, 71, 87, 0.15);
+      color: var(--danger);
+    }
+
+    .badge-yellow {
+      background: rgba(255, 165, 2, 0.15);
+      color: var(--warning);
+    }
+
+    .badge-blue {
+      background: rgba(0, 153, 255, 0.15);
+      color: var(--accent2);
+    }
+
+    /* ALERT */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-success {
+      background: rgba(0, 229, 160, 0.1);
+      border: 1px solid rgba(0, 229, 160, 0.3);
+      color: var(--accent);
+    }
+
+    .alert-error {
+      background: rgba(255, 71, 87, 0.1);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      color: var(--danger);
+    }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 28px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* SEARCH BAR */
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .search-bar input {
+      flex: 1;
+    }
+
+    /* OVERDUE HIGHLIGHT */
+    tr.overdue td {
+      color: var(--danger);
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--surface);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="images/logo.jpg" style="width:80px;margin-bottom:10px; border-radius: 6px;">
+      <h1>Library System</h1>
+      <p>Đại học Công Thương</p>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" onclick="showPage('dashboard')">
+        <span class="icon">◈</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="showPage('auth')">
+        <span class="icon">◉</span> Đăng nhập
+      </div>
+      <div class="nav-item" onclick="showPage('books'); loadBooks()">
+        <span class="icon">▣</span> Sách
+      </div>
+      <div class="nav-item" onclick="showPage('readers'); loadReaders()">
+        <span class="icon">◎</span> Độc giả
+      </div>
+      <div class="nav-item" onclick="showPage('borrow'); loadBorrows()">
+        <span class="icon">◆</span> Phiếu mượn
+      </div>
+      <div class="nav-item" onclick="showPage('overdue'); loadOverdue()">
+        <span class="icon">⚠</span> Quá hạn
+      </div>
+    </nav>
+    <div class="auth-status">
+      <div class="label">Trạng thái</div>
+      <div class="user none" id="auth-display">Chưa đăng nhập</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+      </div>
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-books">—</div>
+          <div class="stat-label">Tổng sách</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-readers">—</div>
+          <div class="stat-label">Độc giả</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-borrows">—</div>
+          <div class="stat-label">Phiếu mượn</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-overdue" style="color:var(--danger)">—</div>
+          <div class="stat-label">Quá hạn</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">API Server</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input id="api-url" value="http://localhost:8000" style="max-width:300px">
+          <button class="btn btn-primary" onclick="checkServer()">Kết nối</button>
+          <span id="server-status" style="font-size:12px;color:var(--muted)">Chưa kiểm tra</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTH -->
+    <div class="page" id="page-auth">
+      <div class="page-header">
+        <div class="page-title">Đăng nhập / Đăng ký</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-title">Đăng nhập</div>
+          <div id="alert-login" class="alert"></div>
+          <div class="form-grid single">
+            <div class="field"><label>Username</label><input id="login-username" placeholder="admin"></div>
+            <div class="field"><label>Password</label><input id="login-password" type="password" placeholder="••••••">
+            </div>
+          </div>
+          <br>
+          <button class="btn btn-primary" onclick="login()">Đăng nhập</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Đăng ký tài khoản mới</div>
+          <div id="alert-register" class="alert"></div>
+          <div class="form-grid single">
+            <div class="field"><label>Username</label><input id="reg-username" placeholder="admin"></div>
+            <div class="field"><label>Email</label><input id="reg-email" placeholder="admin@library.com"></div>
+            <div class="field"><label>Password</label><input id="reg-password" type="password" placeholder="••••••">
+            </div>
+            <div class="field"><label>Role</label>
+              <select id="reg-role">
+                <option value="staff">Staff</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <br>
+          <button class="btn btn-secondary" onclick="register()">Đăng ký</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKS -->
+    <div class="page" id="page-books">
+      <div class="page-header">
+        <div class="page-title">Quản lý Sách</div>
+        <button class="btn btn-primary" onclick="toggleForm('book-form')">+ Thêm sách</button>
+      </div>
+      <div id="book-form" class="card" style="display:none">
+        <div class="card-title">Thêm sách mới</div>
+        <div id="alert-book" class="alert"></div>
+        <div class="form-grid">
+          <div class="field"><label>Mã sách *</label><input id="b-ma" placeholder="S001"></div>
+          <div class="field"><label>Tiêu đề *</label><input id="b-tieu-de" placeholder="Tên sách"></div>
+          <div class="field"><label>Tác giả</label><input id="b-tac-gia" placeholder="Tác giả"></div>
+          <div class="field"><label>Thể loại</label><input id="b-the-loai" placeholder="Kỹ thuật"></div>
+          <div class="field"><label>Năm xuất bản</label><input id="b-nam" type="number" placeholder="2024"></div>
+          <div class="field"><label>Số lượng</label><input id="b-so-luong" type="number" value="1"></div>
+        </div>
+        <br>
+        <button class="btn btn-primary" onclick="addBook()">Lưu sách</button>
+      </div>
+      <div class="card">
+        <div class="search-bar">
+          <input id="book-search" placeholder="Tìm theo tên, tác giả..." onkeyup="searchBooks()">
+          <input id="book-genre" placeholder="Thể loại..." onkeyup="searchBooks()" style="max-width:160px">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Tiêu đề</th>
+                <th>Tác giả</th>
+                <th>Thể loại</th>
+                <th>Năm</th>
+                <th>SL</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="books-table">
+              <tr>
+                <td colspan="7" style="color:var(--muted);text-align:center;padding:24px">Chưa tải dữ liệu</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- READERS -->
+    <div class="page" id="page-readers">
+      <div class="page-header">
+        <div class="page-title">Quản lý Độc giả</div>
+        <button class="btn btn-primary" onclick="toggleForm('reader-form')">+ Thêm độc giả</button>
+      </div>
+      <div id="reader-form" class="card" style="display:none">
+        <div class="card-title">Thêm độc giả mới</div>
+        <div id="alert-reader" class="alert"></div>
+        <div class="form-grid">
+          <div class="field"><label>Mã độc giả *</label><input id="r-ma" placeholder="DG001"></div>
+          <div class="field"><label>Họ tên *</label><input id="r-ten" placeholder="Nguyễn Văn A"></div>
+          <div class="field"><label>Số điện thoại</label><input id="r-sdt" placeholder="0901234567"></div>
+          <div class="field"><label>Email</label><input id="r-email" placeholder="email@example.com"></div>
+          <div class="field"><label>Ngày sinh</label><input id="r-ngay-sinh" type="date"></div>
+          <div class="field"><label>Giới tính</label>
+            <select id="r-gioi-tinh">
+              <option value="">--</option>
+              <option value="Nam">Nam</option>
+              <option value="Nữ">Nữ</option>
+            </select>
+          </div>
+          <div class="field"><label>CCCD</label><input id="r-cccd" placeholder="012345678901"></div>
+          <div class="field"><label>Địa chỉ</label><input id="r-dia-chi" placeholder="TP.HCM"></div>
+        </div>
+        <br>
+        <button class="btn btn-primary" onclick="addReader()">Lưu độc giả</button>
+      </div>
+      <div class="card">
+        <div class="search-bar">
+          <input id="reader-search" placeholder="Tìm theo tên..." onkeyup="searchReaders()">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Họ tên</th>
+                <th>SĐT</th>
+                <th>Email</th>
+                <th>Giới tính</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="readers-table">
+              <tr>
+                <td colspan="6" style="color:var(--muted);text-align:center;padding:24px">Chưa tải dữ liệu</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BORROW -->
+    <div class="page" id="page-borrow">
+      <div class="page-header">
+        <div class="page-title">Phiếu mượn</div>
+        <button class="btn btn-primary" onclick="toggleForm('borrow-form')">+ Tạo phiếu mượn</button>
+      </div>
+      <div id="borrow-form" class="card" style="display:none">
+        <div class="card-title">Tạo phiếu mượn mới</div>
+        <div id="alert-borrow" class="alert"></div>
+        <div class="form-grid">
+          <div class="field"><label>Mã phiếu *</label><input id="bw-ma" placeholder="PM001"></div>
+          <div class="field"><label>Mã độc giả *</label><input id="bw-doc-gia" placeholder="DG001"></div>
+          <div class="field"><label>Mã sách *</label><input id="bw-sach" placeholder="S001"></div>
+          <div class="field"><label>Ngày mượn *</label><input id="bw-ngay-muon" type="date"></div>
+          <div class="field"><label>Hạn trả *</label><input id="bw-han-tra" type="date"></div>
+          <div class="field"><label>Ghi chú</label><input id="bw-ghi-chu" placeholder="..."></div>
+        </div>
+        <br>
+        <button class="btn btn-primary" onclick="createBorrow()">Tạo phiếu</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+          <span>Trả sách</span>
+        </div>
+        <div id="alert-return" class="alert"></div>
+        <div style="display:flex;gap:10px;align-items:flex-end">
+          <div class="field" style="flex:1"><label>Mã phiếu mượn</label><input id="return-ma" placeholder="PM001"></div>
+          <div class="field" style="flex:1"><label>Ngày trả</label><input id="return-ngay" type="date"></div>
+          <button class="btn btn-secondary" onclick="returnBook()">Xác nhận trả</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã phiếu</th>
+                <th>Độc giả</th>
+                <th>Sách</th>
+                <th>Ngày mượn</th>
+                <th>Hạn trả</th>
+                <th>Ngày trả</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody id="borrow-table">
+              <tr>
+                <td colspan="7" style="color:var(--muted);text-align:center;padding:24px">Chưa tải dữ liệu</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- OVERDUE -->
+    <div class="page" id="page-overdue">
+      <div class="page-header">
+        <div class="page-title">⚠ Sách quá hạn</div>
+        <button class="btn btn-secondary" onclick="loadOverdue()">↻ Làm mới</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã phiếu</th>
+                <th>Độc giả</th>
+                <th>Sách</th>
+                <th>Ngày mượn</th>
+                <th>Hạn trả</th>
+                <th>Số ngày trễ</th>
+              </tr>
+            </thead>
+            <tbody id="overdue-table">
+              <tr>
+                <td colspan="6" style="color:var(--muted);text-align:center;padding:24px">Chưa tải dữ liệu</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API = () => document.getElementById('api-url').value.replace(/\/$/, '');
+    let token = localStorage.getItem('lib_token') || '';
+    let currentUser = localStorage.getItem('lib_user') || '';
+
+
+
+    function updateAuthDisplay() {
+      const el = document.getElementById('auth-display');
+      if (token) { el.textContent = currentUser; el.className = 'user'; }
+      else { el.textContent = 'Chưa đăng nhập'; el.className = 'user none'; }
+    }
+
+    updateAuthDisplay();
+
+    function headers() {
+      const h = { 'Content-Type': 'application/json' };
+      if (token) h['Authorization'] = `Bearer ${token}`;
+      return h;
+    }
+
+    function showPage(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      event.currentTarget.classList.add('active');
+      if (name === 'dashboard') loadStats();
+    }
+
+    function toggleForm(id) {
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function showAlert(id, msg, type) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = `alert alert-${type} show`;
+      setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    // TODAY
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type=date]').forEach(i => i.value = today);
+
+    // ===== AUTH =====
+    async function login() {
+      const r = await fetch(`${API()}/auth/login`, {
+        method: 'POST', headers: headers(),
+        body: JSON.stringify({ username: document.getElementById('login-username').value, password: document.getElementById('login-password').value })
+      });
+      const d = await r.json();
+      if (r.ok) {
+        token = d.access_token;
+        currentUser = document.getElementById('login-username').value;
+        localStorage.setItem('lib_token', token);
+        localStorage.setItem('lib_user', currentUser);
+        updateAuthDisplay();
+        showAlert('alert-login', '✓ Đăng nhập thành công!', 'success');
+      } else showAlert('alert-login', d.detail || 'Lỗi đăng nhập', 'error');
+    }
+
+    async function register() {
+      const r = await fetch(`${API()}/auth/register`, {
+        method: 'POST', headers: headers(),
+        body: JSON.stringify({
+          username: document.getElementById('reg-username').value,
+          email: document.getElementById('reg-email').value,
+          password: document.getElementById('reg-password').value,
+          role: document.getElementById('reg-role').value
+        })
+      });
+      const d = await r.json();
+      if (r.ok) showAlert('alert-register', '✓ Đăng ký thành công! Hãy đăng nhập.', 'success');
+      else showAlert('alert-register', d.detail || 'Lỗi đăng ký', 'error');
+    }
+
+    // ===== BOOKS =====
+    let allBooks = [];
+
+    async function loadBooks() {
+      const r = await fetch(`${API()}/books/`, { headers: headers() });
+      allBooks = await r.json();
+      renderBooks(allBooks);
+    }
+
+    function renderBooks(books) {
+      const tb = document.getElementById('books-table');
+      if (!books.length) { tb.innerHTML = '<tr><td colspan="7" style="color:var(--muted);text-align:center;padding:24px">Không có dữ liệu</td></tr>'; return; }
+      tb.innerHTML = books.map(b => `
+      <tr>
+        <td><span class="badge badge-blue">${b.ma_sach}</span></td>
+        <td>${b.tieu_de}</td>
+        <td>${b.tac_gia || '—'}</td>
+        <td>${b.the_loai || '—'}</td>
+        <td>${b.nam_xb || '—'}</td>
+        <td><span class="badge ${b.so_luong > 0 ? 'badge-green' : 'badge-red'}">${b.so_luong}</span></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteBook('${b.ma_sach}')">Xóa</button></td>
+        <td><button class="btn btn-secondary btn-sm" onclick="editBook('${b.ma_sach}', '${b.tieu_de}', '${b.tac_gia}', '${b.the_loai}', '${b.nam_xb}', '${b.so_luong}')">Sửa</button></td>
+      </tr>`).join('');
+    }
+
+    function searchBooks() {
+      const q = document.getElementById('book-search').value.toLowerCase();
+      const g = document.getElementById('book-genre').value.toLowerCase();
+      renderBooks(allBooks.filter(b =>
+        (!q || b.tieu_de?.toLowerCase().includes(q) || b.tac_gia?.toLowerCase().includes(q)) &&
+        (!g || b.the_loai?.toLowerCase().includes(g))
+      ));
+    }
+
+    async function addBook() {
+      const body = {
+        ma_sach: document.getElementById('b-ma').value,
+        tieu_de: document.getElementById('b-tieu-de').value,
+        tac_gia: document.getElementById('b-tac-gia').value || null,
+        the_loai: document.getElementById('b-the-loai').value || null,
+        nam_xb: parseInt(document.getElementById('b-nam').value) || null,
+        so_luong: parseInt(document.getElementById('b-so-luong').value) || 1,
+      };
+      const r = await fetch(`${API()}/books/`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+      const d = await r.json();
+      if (r.ok) { showAlert('alert-book', 'Thêm sách thành công!', 'success'); loadBooks(); }
+      else showAlert('alert-book', d.detail || 'Lỗi', 'error');
+    }
+
+    async function deleteBook(ma) {
+      if (!confirm(`Xóa sách ${ma}?`)) return;
+      await fetch(`${API()}/books/${ma}`, { method: 'DELETE', headers: headers() });
+      loadBooks();
+    }
+
+    function editBook(ma, tieu_de, tac_gia, the_loai, nam_xb, so_luong) {
+      // Mở form và điền sẵn dữ liệu
+      document.getElementById('book-form').style.display = 'block';
+      document.getElementById('b-ma').value = ma;
+      document.getElementById('b-ma').readOnly = true; // Không cho đổi mã
+      document.getElementById('b-tieu-de').value = tieu_de;
+      document.getElementById('b-tac-gia').value = tac_gia;
+      document.getElementById('b-the-loai').value = the_loai;
+      document.getElementById('b-nam').value = nam_xb;
+      document.getElementById('b-so-luong').value = so_luong;
+
+      // Đổi nút Lưu thành Update
+      const btn = document.querySelector('#book-form .btn-primary');
+      btn.textContent = 'Cập nhật sách';
+      btn.onclick = () => updateBook(ma);
+    }
+
+    async function updateBook(ma) {
+      const body = {
+        tieu_de: document.getElementById('b-tieu-de').value,
+        tac_gia: document.getElementById('b-tac-gia').value || null,
+        the_loai: document.getElementById('b-the-loai').value || null,
+        nam_xb: parseInt(document.getElementById('b-nam').value) || null,
+        so_luong: parseInt(document.getElementById('b-so-luong').value) || 1,
+      };
+      const r = await fetch(`${API()}/books/${ma}`, { method: 'PUT', headers: headers(), body: JSON.stringify(body) });
+      const d = await r.json();
+      if (r.ok) {
+        showAlert('alert-book', 'Cập nhật sách thành công!', 'success');
+        // Reset form về trạng thái thêm mới
+        document.getElementById('b-ma').readOnly = false;
+        const btn = document.querySelector('#book-form .btn-primary');
+        btn.textContent = 'Lưu sách';
+        btn.onclick = addBook;
+        loadBooks();
+      }
+
+      else showAlert('alert-book', d.detail || 'Lỗi', 'error');
+    }
+
+
+    // ===== Độc giả =====
+    let allReaders = [];
+
+    async function loadReaders() {
+      const r = await fetch(`${API()}/readers/`, { headers: headers() });
+      allReaders = await r.json();
+      renderReaders(allReaders);
+    }
+
+    function renderReaders(readers) {
+      const tb = document.getElementById('readers-table');
+      if (!readers.length) { tb.innerHTML = '<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px">Không có dữ liệu</td></tr>'; return; }
+      tb.innerHTML = readers.map(r => `
+      <tr>
+        <td><span class="badge badge-blue">${r.ma_doc_gia}</span></td>
+        <td>${r.ten}</td>
+        <td>${r.sdt || '—'}</td>
+        <td>${r.email || '—'}</td>
+        <td>${r.gioi_tinh || '—'}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteReader('${r.ma_doc_gia}')">Xóa</button></td>
+        <td><button class="btn btn-warning btn-sm" onclick="editReader('${r.ma_doc_gia}', '${r.ten}', '${r.sdt}', '${r.email}', '${r.ngay_sinh}', '${r.gioi_tinh}', '${r.cccd}', '${r.dia_chi}')">Sửa</button></td>
+
+        </tr>`).join('');
+    }
+
+    function searchReaders() {
+      const q = document.getElementById('reader-search').value.toLowerCase();
+      renderReaders(allReaders.filter(r => !q || r.ten?.toLowerCase().includes(q)));
+    }
+
+    async function addReader() {
+      const body = {
+        ma_doc_gia: document.getElementById('r-ma').value,
+        ten: document.getElementById('r-ten').value,
+        sdt: document.getElementById('r-sdt').value || null,
+        email: document.getElementById('r-email').value || null,
+        ngay_sinh: document.getElementById('r-ngay-sinh').value || null,
+        gioi_tinh: document.getElementById('r-gioi-tinh').value || null,
+        cccd: document.getElementById('r-cccd').value || null,
+        dia_chi: document.getElementById('r-dia-chi').value || null,
+      };
+      const r = await fetch(`${API()}/readers/`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+      const d = await r.json();
+      if (r.ok) { showAlert('alert-reader', 'Thêm độc giả thành công!', 'success'); loadReaders(); }
+      else showAlert('alert-reader', d.detail || 'Lỗi', 'error');
+    }
+
+    async function deleteReader(ma) {
+      if (!confirm(`Xóa độc giả ${ma}?`)) return;
+      await fetch(`${API()}/readers/${ma}`, { method: 'DELETE', headers: headers() });
+      loadReaders();
+    }
+
+    function editReader(ma, ten, sdt, email, ngay_sinh, gioi_tinh, cccd, dia_chi) {
+      // Mở form và điền sẵn dữ liệu
+      document.getElementById('reader-form').style.display = 'block';
+      document.getElementById('r-ma').value = ma;
+      document.getElementById('r-ma').readOnly = true; // Không cho đổi mã
+      document.getElementById('r-ten').value = ten;
+      document.getElementById('r-sdt').value = sdt;
+      document.getElementById('r-email').value = email;
+      document.getElementById('r-ngay-sinh').value = ngay_sinh;
+      document.getElementById('r-gioi-tinh').value = gioi_tinh;
+      document.getElementById('r-cccd').value = cccd;
+      document.getElementById('r-dia-chi').value = dia_chi;
+
+      // Đổi nút Lưu thành Update
+      const btn = document.querySelector('#reader-form .btn-primary');
+      btn.textContent = 'Cập nhật độc giả';
+      btn.onclick = () => updateReader(ma);
+    }
+
+    async function updateReader(ma) {
+      const body = {
+        ten: document.getElementById('r-ten').value,
+        sdt: document.getElementById('r-sdt').value || null,
+        email: document.getElementById('r-email').value || null,
+        ngay_sinh: document.getElementById('r-ngay-sinh').value || null,
+        gioi_tinh: document.getElementById('r-gioi-tinh').value || null,
+        cccd: document.getElementById('r-cccd').value || null,
+        dia_chi: document.getElementById('r-dia-chi').value || null,
+      };
+      const r = await fetch(`${API()}/readers/${ma}`, { method: 'PUT', headers: headers(), body: JSON.stringify(body) });
+      const d = await r.json();
+      if (r.ok) {
+        showAlert('alert-reader', 'Cập nhật độc giả thành công!', 'success');
+        // Reset form về trạng thái thêm mới
+        document.getElementById('r-ma').readOnly = false;
+        const btn = document.querySelector('#reader-form .btn-primary');
+        btn.textContent = 'Lưu độc giả';
+        btn.onclick = addReader;
+        loadReaders();
+      }
+
+      else showAlert('alert-reader', d.detail || 'Lỗi', 'error');
+    }
+
+    // ===== Mượn Sách =====
+    async function loadBorrows() {
+      const r = await fetch(`${API()}/borrow/`, { headers: headers() });
+      const data = await r.json();
+      const tb = document.getElementById('borrow-table');
+      if (!data.length) { tb.innerHTML = '<tr><td colspan="7" style="color:var(--muted);text-align:center;padding:24px">Không có dữ liệu</td></tr>'; return; }
+      tb.innerHTML = data.map(b => {
+        const badge = b.trang_thai === 'da_tra' ? 'badge-green' : b.trang_thai === 'qua_han' ? 'badge-red' : 'badge-yellow';
+        const label = b.trang_thai === 'da_tra' ? 'Đã trả' : b.trang_thai === 'qua_han' ? 'Quá hạn' : 'Đang mượn';
+        return `<tr>
+        <td><span class="badge badge-blue">${b.ma_phieu}</span></td>
+        <td>${b.reader?.ten || '—'}</td>
+        <td>${b.book?.tieu_de || '—'}</td>
+        <td>${b.ngay_muon}</td>
+        <td>${b.ngay_hen_tra}</td>
+        <td>${b.ngay_tra || '—'}</td>
+        <td><span class="badge ${badge}">${label}</span></td>
+      </tr>`;
+      }).join('');
+    }
+
+    async function createBorrow() {
+      const body = {
+        ma_phieu: document.getElementById('bw-ma').value,
+        ma_doc_gia: document.getElementById('bw-doc-gia').value,
+        ma_sach: document.getElementById('bw-sach').value,
+        ngay_muon: document.getElementById('bw-ngay-muon').value,
+        ngay_hen_tra: document.getElementById('bw-han-tra').value,
+        ghi_chu: document.getElementById('bw-ghi-chu').value || null,
+      };
+      const r = await fetch(`${API()}/borrow/`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+      const d = await r.json();
+      if (r.ok) { showAlert('alert-borrow', '✓ Tạo phiếu mượn thành công!', 'success'); loadBorrows(); }
+      else showAlert('alert-borrow', d.detail || 'Lỗi', 'error');
+    }
+
+    async function returnBook() {
+      const body = { ma_phieu: document.getElementById('return-ma').value, ngay_tra: document.getElementById('return-ngay').value };
+      const r = await fetch(`${API()}/borrow/return`, { method: 'PATCH', headers: headers(), body: JSON.stringify(body) });
+      const d = await r.json();
+      if (r.ok) { showAlert('alert-return', '✓ Trả sách thành công!', 'success'); loadBorrows(); }
+      else showAlert('alert-return', d.detail || 'Lỗi', 'error');
+    }
+
+    // ===== Quá hạn =====
+    async function loadOverdue() {
+      const r = await fetch(`${API()}/borrow/overdue`, { headers: headers() });
+      const data = await r.json();
+      const tb = document.getElementById('overdue-table');
+      if (!data.length) { tb.innerHTML = '<tr><td colspan="6" style="color:var(--accent);text-align:center;padding:24px">✓ Không có sách quá hạn</td></tr>'; return; }
+      const today = new Date();
+      tb.innerHTML = data.map(b => {
+        const due = new Date(b.ngay_hen_tra);
+        const days = Math.floor((today - due) / 86400000);
+        return `<tr class="overdue">
+        <td><span class="badge badge-red">${b.ma_phieu}</span></td>
+        <td>${b.reader?.ten || '—'}</td>
+        <td>${b.book?.tieu_de || '—'}</td>
+        <td>${b.ngay_muon}</td>
+        <td>${b.ngay_hen_tra}</td>
+        <td><span class="badge badge-red">+${days} ngày</span></td>
+      </tr>`;
+      }).join('');
+    }
+
+    // ===== STATS =====
+    async function loadStats() {
+      try {
+        const [books, readers, borrows, overdue] = await Promise.all([
+          fetch(`${API()}/books/`, { headers: headers() }).then(r => r.json()),
+          fetch(`${API()}/readers/`, { headers: headers() }).then(r => r.json()),
+          fetch(`${API()}/borrow/`, { headers: headers() }).then(r => r.json()),
+          fetch(`${API()}/borrow/overdue`, { headers: headers() }).then(r => r.json()),
+        ]);
+        document.getElementById('stat-books').textContent = books.length ?? '—';
+        document.getElementById('stat-readers').textContent = readers.length ?? '—';
+        document.getElementById('stat-borrows').textContent = borrows.length ?? '—';
+        document.getElementById('stat-overdue').textContent = overdue.length ?? '—';
+      } catch (e) { }
+    }
+
+    async function checkServer() {
+      try {
+        const r = await fetch(`${API()}/`);
+        const d = await r.json();
+        document.getElementById('server-status').textContent = '● Kết nối thành công';
+        document.getElementById('server-status').style.color = 'var(--accent)';
+        loadStats();
+      } catch (e) {
+        document.getElementById('server-status').textContent = '● Không kết nối được';
+        document.getElementById('server-status').style.color = 'var(--danger)';
+      }
+    }
+
+    // Auto check on load
+    checkServer();
+  </script>
+</body>
+
+</html>
